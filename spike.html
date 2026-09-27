@@ -1,0 +1,1094 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Creator OS · M0 phone test</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --line: #2a2f3a;
+    --text: #f2f3f5;
+    --muted: #9aa1ad;
+    --accent: #4f8cff;
+    --rec: #ff4d4f;
+    --ok: #3ecf8e;
+    --warn: #f5a524;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  main { max-width: 520px; margin: 0 auto; padding: 16px 16px 48px; }
+  h1 { font-size: 20px; margin: 4px 0 2px; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
+  .card { background: var(--card); border-radius: 14px; padding: 14px; margin-bottom: 14px; }
+  .card h2 {
+    font-size: 13px; margin: 0 0 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .05em;
+  }
+  video {
+    display: block; width: 100%; max-height: 60vh;
+    background: #000; border-radius: 10px; object-fit: contain;
+  }
+  #live.mirror { transform: scaleX(-1); }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  button {
+    flex: 1 1 auto; min-height: 48px; padding: 12px 16px;
+    font: inherit; font-weight: 600; color: var(--text);
+    background: var(--line); border: 0; border-radius: 10px;
+  }
+  button.primary { background: var(--accent); }
+  button.rec { background: var(--rec); }
+  button:disabled { opacity: .4; }
+  label.toggle { display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 14px; color: var(--muted); }
+  .info { font-size: 14px; color: var(--muted); margin-top: 8px; word-break: break-word; }
+  .error { color: var(--rec); }
+  .warning { color: var(--warn); }
+  .good { color: var(--ok); }
+  .notice {
+    margin: 10px 0 0; padding: 12px; border-radius: 10px;
+    background: #2b2020; border: 1px solid #5a2f2f; font-size: 14px;
+  }
+  .notice b { display: block; margin-bottom: 4px; }
+  .notice ul, .notice ol { margin: 6px 0 0; padding-left: 26px; }
+  .notice li { margin-bottom: 4px; }
+  .meter { height: 8px; margin-top: 12px; background: var(--line); border-radius: 4px; overflow: hidden; }
+  #micBar { height: 100%; width: 0; background: var(--ok); transition: width .08s linear; }
+  .rec-status { font-weight: 700; margin-top: 8px; min-height: 22px; }
+  .rec-status.recording { color: var(--rec); }
+  .details { font-size: 14px; margin-top: 10px; }
+  .details div { padding: 3px 0; border-top: 1px solid var(--line); word-break: break-word; }
+  .details div:first-child { border-top: 0; }
+  .details span { color: var(--muted); }
+  .hidden { display: none !important; }
+  ul.takes { list-style: none; margin: 0; padding: 0; }
+  ul.takes li { border-top: 1px solid var(--line); padding: 10px 0; }
+  ul.takes li:first-child { border-top: 0; }
+  ul.takes .name { font-weight: 600; }
+  ul.takes .meta { font-size: 13px; color: var(--muted); }
+  ul.takes button { min-height: 40px; padding: 8px 12px; font-size: 14px; }
+  pre {
+    margin: 0; white-space: pre-wrap; word-break: break-word;
+    font-size: 12px; color: var(--muted); background: var(--bg);
+    padding: 10px; border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Creator OS · M0 phone test</h1>
+  <p class="sub">Temporary test page. It checks one thing: can this phone record a video that CapCut can use?</p>
+
+  <!-- Shown only when the page is opened somewhere the camera cannot work -->
+  <div id="envWarning" class="notice hidden"></div>
+
+  <!-- STEP 1: CAMERA & MICROPHONE -->
+  <section class="card">
+    <h2>1 · Camera &amp; microphone</h2>
+    <video id="live" autoplay muted playsinline></video>
+    <div class="row">
+      <button id="cameraButton" class="primary">Enable camera &amp; microphone</button>
+      <button id="retryButton" class="hidden">Try again</button>
+    </div>
+    <div id="permHelp" class="notice hidden"></div>
+    <div class="meter"><div id="micBar"></div></div>
+    <p id="micStatus" class="info">Microphone: off</p>
+    <label class="toggle">
+      <input type="checkbox" id="mirrorToggle" checked>
+      Mirror the preview (the saved video is never mirrored)
+    </label>
+    <p id="cameraInfo" class="info"></p>
+  </section>
+
+  <!-- STEP 2: RECORD -->
+  <section class="card">
+    <h2>2 · Record</h2>
+    <div class="row">
+      <button id="recordButton" class="rec" disabled>Record</button>
+    </div>
+    <p id="recStatus" class="rec-status"></p>
+    <p id="storageInfo" class="info"></p>
+  </section>
+
+  <!-- STEP 3: CHECK AND SAVE -->
+  <section class="card">
+    <h2>3 · Check and save</h2>
+    <p id="emptyPlayer" class="info">Record a take, then it appears here.</p>
+    <video id="player" class="hidden" controls playsinline></video>
+    <div id="fileDetails" class="details hidden"></div>
+    <div class="row">
+      <button id="downloadButton" disabled>Download file</button>
+      <button id="shareButton" class="hidden">Share…</button>
+    </div>
+    <p class="info">
+      The preview above plays the <b>same file</b> that Download saves.
+      If the preview works but the downloaded file doesn't, the problem is the download.
+      If the preview fails, the problem is the recording.
+    </p>
+  </section>
+
+  <!-- TAKES SAVED ON THIS PHONE -->
+  <section class="card">
+    <h2>Takes on this phone</h2>
+    <ul id="takeList" class="takes"></ul>
+  </section>
+
+  <!-- REPORT FOR CLAUDE -->
+  <section class="card">
+    <h2>Report</h2>
+    <pre id="report">Nothing yet.</pre>
+    <div class="row">
+      <button id="copyButton">Copy report</button>
+    </div>
+  </section>
+</main>
+
+<script>
+// =====================================================================
+// CREATOR OS · M0 SPIKE
+// One job: prove that this phone can record a usable video in the browser.
+// Reading order: helpers → where am I running → database → storage →
+// camera & permissions → microphone meter → recording → file checks,
+// playback & download → take list → report → start.
+// =====================================================================
+
+
+// ---------------------------------------------------------------------
+// 1. SMALL HELPERS
+// ---------------------------------------------------------------------
+
+// Shortcut: $('recordButton') instead of document.getElementById('recordButton')
+const $ = (id) => document.getElementById(id);
+
+function formatMB(bytes) {
+  return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+}
+
+function formatTime(seconds) {
+  const s = Math.floor(seconds);
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+
+function show(id) { $(id).classList.remove('hidden'); }
+function hide(id) { $(id).classList.add('hidden'); }
+
+// Fills a notice box with a bold title, an optional list, and steps.
+// Uses textContent, never innerHTML, so no text can break the page.
+function fillNotice(id, title, items, steps) {
+  const box = $(id);
+  box.textContent = '';
+  const heading = document.createElement('b');
+  heading.textContent = title;
+  box.appendChild(heading);
+  if (items && items.length) {
+    const list = document.createElement('ul');
+    for (const text of items) {
+      const li = document.createElement('li');
+      li.textContent = text;
+      list.appendChild(li);
+    }
+    box.appendChild(list);
+  }
+  if (steps && steps.length) {
+    const list = document.createElement('ol');
+    for (const text of steps) {
+      const li = document.createElement('li');
+      li.textContent = text;
+      list.appendChild(li);
+    }
+    box.appendChild(list);
+  }
+  box.classList.remove('hidden');
+}
+
+// Everything the report shows is collected in this one object.
+const facts = {
+  permissionsOnLoad: 'not read yet',
+  permissionLog: [],
+  camera: '',
+  micHeard: false,
+  formatChosen: '',
+  codecs: '',
+  fileDetails: '',
+  previewResult: '',
+  persisted: 'unknown',
+  storage: '',
+  shareAvailable: 'unknown',
+};
+
+
+// ---------------------------------------------------------------------
+// 2. WHERE IS THIS PAGE RUNNING?
+// The camera only works when this page is opened DIRECTLY in a real
+// browser from an https:// address. Opened as a downloaded file, inside
+// an app's preview, or inside another page, the phone blocks the camera
+// — and the error looks exactly like "permission blocked".
+// ---------------------------------------------------------------------
+
+const userAgent = navigator.userAgent;
+
+function detectBrowser() {
+  if (/SamsungBrowser/i.test(userAgent)) return 'Samsung Internet';
+  if (/; wv\)/.test(userAgent)) return 'Android app viewer (WebView)';
+  if (/EdgA?\//.test(userAgent)) return 'Edge';
+  if (/OPR\//.test(userAgent)) return 'Opera';
+  if (/Firefox|FxiOS/.test(userAgent)) return 'Firefox';
+  if (/CriOS|Chrome\//.test(userAgent)) return 'Chrome';
+  if (/Safari\//.test(userAgent)) return 'Safari';
+  return 'Other';
+}
+const browserName = detectBrowser();
+
+function isEmbedded() {
+  try {
+    return window.self !== window.top;
+  } catch (error) {
+    return true; // a parent page we are not allowed to see = we are embedded
+  }
+}
+
+// Chrome can tell us if this page is forbidden from using the camera.
+function cameraAllowedHere() {
+  const policy = document.permissionsPolicy || document.featurePolicy;
+  if (policy && policy.allowsFeature) {
+    return policy.allowsFeature('camera') && policy.allowsFeature('microphone');
+  }
+  return true; // this browser can't tell us: assume yes
+}
+
+function findEnvironmentProblems() {
+  const problems = [];
+  if (location.protocol === 'file:' || location.protocol === 'content:') {
+    problems.push('It was opened as a downloaded file. Phones block the camera for files.');
+  } else if (!window.isSecureContext) {
+    problems.push('It is not on an https:// address, so the camera is blocked.');
+  }
+  if (browserName === 'Android app viewer (WebView)') {
+    problems.push("It is open inside an app's built-in viewer, which usually blocks the camera.");
+  }
+  if (isEmbedded()) {
+    problems.push('It is running inside another page or a preview window.');
+  }
+  if (!cameraAllowedHere()) {
+    problems.push('This window is not allowed to use the camera or microphone.');
+  }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    problems.push('This browser cannot open the camera from a web page.');
+  }
+  if (!window.MediaRecorder) {
+    problems.push('This browser cannot record video from a web page.');
+  }
+  return problems;
+}
+
+function showEnvironmentWarning() {
+  const problems = findEnvironmentProblems();
+  if (problems.length === 0) {
+    hide('envWarning');
+    return;
+  }
+  fillNotice('envWarning', "The camera can't work where this page is open:", problems, [
+    'Open the Chrome app.',
+    'Type or paste this page\'s https:// address into the address bar.',
+    'Tap "Enable camera & microphone".',
+  ]);
+}
+
+
+// ---------------------------------------------------------------------
+// 3. DATABASE (IndexedDB)
+// The browser's built-in database. It survives closing the tab.
+// Two "tables":
+//   takes  → one row per take: name, format, finished or not
+//   chunks → the video itself, stored as 1-second pieces as they arrive
+// Storing pieces while recording means a crash loses at most ~1 second.
+// ---------------------------------------------------------------------
+
+let db = null;
+
+function openDatabase() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('creator-os-spike', 1);
+    // Runs only the first time: creates the two tables.
+    request.onupgradeneeded = () => {
+      const database = request.result;
+      database.createObjectStore('takes', { keyPath: 'id' });
+      const chunks = database.createObjectStore('chunks', { autoIncrement: true });
+      chunks.createIndex('byTake', 'takeId');
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+// Runs one action on one table and waits until it is really written.
+function dbRun(tableName, mode, action) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(tableName, mode);
+    const request = action(transaction.objectStore(tableName));
+    transaction.oncomplete = () => resolve(request.result);
+    transaction.onerror = () => reject(transaction.error);
+    transaction.onabort = () => reject(transaction.error);
+  });
+}
+
+function saveTake(take) {
+  return dbRun('takes', 'readwrite', (table) => table.put(take));
+}
+
+async function getAllTakes() {
+  const takes = await dbRun('takes', 'readonly', (table) => table.getAll());
+  return takes.sort((a, b) => a.createdAt - b.createdAt);
+}
+
+// Saves one piece of video AND the updated take row in one step,
+// so the take always knows how much of it is safely stored.
+function saveChunk(take, index, bytes) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(['chunks', 'takes'], 'readwrite');
+    transaction.objectStore('chunks').add({ takeId: take.id, index: index, data: bytes });
+    take.chunkCount = Math.max(take.chunkCount, index + 1);
+    take.sizeBytes += bytes.byteLength;
+    take.durationSec = (performance.now() - recordingStartedAt) / 1000;
+    transaction.objectStore('takes').put(take);
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error);
+    transaction.onabort = () => reject(transaction.error);
+  });
+}
+
+// Reads all pieces of a take, in the right order.
+async function getChunks(takeId) {
+  const rows = await dbRun('chunks', 'readonly', (table) => table.index('byTake').getAll(takeId));
+  rows.sort((a, b) => a.index - b.index);
+  return rows.map((row) => row.data);
+}
+
+// Deletes a take and all its pieces.
+function deleteTake(takeId) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(['takes', 'chunks'], 'readwrite');
+    transaction.objectStore('takes').delete(takeId);
+    const chunks = transaction.objectStore('chunks');
+    const cursorRequest = chunks.index('byTake').openKeyCursor(IDBKeyRange.only(takeId));
+    cursorRequest.onsuccess = () => {
+      const cursor = cursorRequest.result;
+      if (cursor) {
+        chunks.delete(cursor.primaryKey);
+        cursor.continue();
+      }
+    };
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error);
+  });
+}
+
+
+// ---------------------------------------------------------------------
+// 4. STORAGE SAFETY
+// Browser storage is WORKING storage, not a backup.
+// We ask the browser to protect it, and we show how full it is.
+// ---------------------------------------------------------------------
+
+const LOW_SPACE_BYTES = 300 * 1024 * 1024; // warn below ~300 MB free
+const BYTES_PER_MINUTE = 50 * 1024 * 1024; // rough size of one minute of video
+
+async function askForPersistentStorage() {
+  if (!navigator.storage || !navigator.storage.persist) {
+    facts.persisted = 'not supported';
+    return;
+  }
+  let granted = await navigator.storage.persisted();
+  if (!granted) granted = await navigator.storage.persist();
+  facts.persisted = granted ? 'yes' : 'no (the browser may clear it if the phone runs low on space)';
+}
+
+async function updateStorageInfo() {
+  if (!navigator.storage || !navigator.storage.estimate) {
+    facts.storage = 'not available on this browser';
+    $('storageInfo').textContent = '';
+    return;
+  }
+  const { usage, quota } = await navigator.storage.estimate();
+  const free = quota - usage;
+  const minutesLeft = Math.floor(free / BYTES_PER_MINUTE);
+  facts.storage = formatMB(usage) + ' used of ' + formatMB(quota);
+
+  const line = $('storageInfo');
+  if (free < LOW_SPACE_BYTES) {
+    line.className = 'info warning';
+    line.textContent = 'Storage almost full: ' + facts.storage +
+      '. Download your takes and delete old ones before recording again.';
+  } else {
+    line.className = 'info';
+    line.textContent = 'Storage: ' + facts.storage + ' · room for about ' +
+      minutesLeft.toLocaleString() + ' min of video.';
+  }
+}
+
+
+// ---------------------------------------------------------------------
+// 5. CAMERA & MICROPHONE PERMISSIONS
+// Rule: the permission prompt only ever appears because you tapped a
+// button. Nothing asks on page load.
+// ---------------------------------------------------------------------
+
+let stream = null;
+
+// Reads a permission WITHOUT asking for it.
+// Answers: 'granted', 'prompt' (not asked yet), 'denied', or 'not detectable'.
+async function readPermission(name) {
+  try {
+    const status = await navigator.permissions.query({ name: name });
+    return status.state;
+  } catch (error) {
+    return 'not detectable';
+  }
+}
+
+async function readPermissions() {
+  const [camera, microphone] = await Promise.all([readPermission('camera'), readPermission('microphone')]);
+  return { camera, microphone };
+}
+
+// One line per attempt, kept for the report.
+function logPermissionAttempt(outcome, statesBefore, error, elapsedMs) {
+  const line = new Date().toLocaleTimeString() + ' · ' + outcome +
+    ' · before: camera=' + statesBefore.camera + ', mic=' + statesBefore.microphone +
+    (error ? ' · ' + error.name + ': ' + error.message : '') +
+    ' · answered in ' + Math.round(elapsedMs) + ' ms';
+  facts.permissionLog.push(line);
+  console.log('[Creator OS] permission', line);
+}
+
+async function enableCamera() {
+  hide('permHelp');
+  hide('retryButton');
+  $('cameraButton').disabled = true;
+  $('cameraInfo').className = 'info';
+  $('cameraInfo').textContent = 'Waiting for your answer to the permission prompt…';
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    const error = { name: 'Unsupported', message: 'navigator.mediaDevices.getUserMedia is missing' };
+    handleCameraFailure(error, 0, { camera: 'not detectable', microphone: 'not detectable' });
+    return;
+  }
+
+  // Ask for camera AND microphone immediately, inside the tap.
+  const askedAt = performance.now();
+  const request = navigator.mediaDevices.getUserMedia({
+    // "user" = front camera. The sizes are wishes, not orders.
+    video: { facingMode: 'user', width: { ideal: 1080 }, height: { ideal: 1920 } },
+    audio: true,
+  });
+  // Turn success/failure into a plain value, so nothing is left unhandled.
+  const outcome = request.then(
+    (result) => ({ stream: result, elapsed: performance.now() - askedAt }),
+    (error) => ({ error: error, elapsed: performance.now() - askedAt })
+  );
+  const statesBefore = await readPermissions();
+  const result = await outcome;
+
+  if (result.error) {
+    handleCameraFailure(result.error, result.elapsed, statesBefore);
+    return;
+  }
+
+  logPermissionAttempt('granted', statesBefore, null, result.elapsed);
+  stream = result.stream;
+  $('live').srcObject = stream;
+  $('live').play().catch(() => {});
+
+  const settings = stream.getVideoTracks()[0].getSettings();
+  facts.camera = settings.width + '×' + settings.height + ', ' +
+    (settings.facingMode || 'unknown') + ' camera, ' +
+    Math.round(settings.frameRate || 0) + ' fps';
+  $('cameraInfo').className = 'info good';
+  $('cameraInfo').textContent = 'Camera on: ' + facts.camera;
+
+  // If the camera stops by itself (another app took it, phone locked…)
+  stream.getVideoTracks()[0].addEventListener('ended', () => {
+    stopRecording();
+    $('cameraInfo').className = 'info warning';
+    $('cameraInfo').textContent = 'The camera stopped. Tap "Try again".';
+    show('retryButton');
+    $('recordButton').disabled = true;
+  });
+
+  $('cameraButton').textContent = 'Camera & microphone on';
+  $('recordButton').disabled = false;
+  startMicMeter(stream);
+  await askForPersistentStorage();
+  await updateStorageInfo();
+  updateReport();
+}
+
+// Sorts any camera error into one of the cases we know how to explain.
+function classifyCameraError(error, elapsedMs, statesBefore) {
+  // If the browser itself says "denied", that is the cause, whatever the error name.
+  if (statesBefore.camera === 'denied' || statesBefore.microphone === 'denied') {
+    return findEnvironmentProblems().length ? 'environment' : 'blocked';
+  }
+  switch (error.name) {
+    case 'NotAllowedError':
+    case 'PermissionDeniedError':
+    case 'SecurityError':
+      if (findEnvironmentProblems().length) return 'environment';
+      if (statesBefore.camera === 'denied' || statesBefore.microphone === 'denied') return 'blocked';
+      // A human needs more than ~0.4 s to answer a prompt.
+      // An instant "no" means the browser refused without asking you.
+      if (elapsedMs < 400) return 'blocked';
+      return 'denied';
+    case 'NotFoundError':
+    case 'DevicesNotFoundError':
+    case 'OverconstrainedError':
+      return 'no-device';
+    case 'NotReadableError':
+    case 'TrackStartError':
+    case 'AbortError':
+      return 'in-use';
+    case 'TypeError':
+    case 'NotSupportedError':
+    case 'Unsupported':
+      return 'unsupported';
+    default:
+      return 'unknown';
+  }
+}
+
+function blockedSteps() {
+  const appName = browserName === 'Samsung Internet' ? 'Samsung Internet' : 'Chrome';
+  const phoneStep = 'Still blocked? Phone Settings → Apps → ' + appName +
+    ' → Permissions → set Camera and Microphone to Allow.';
+  if (browserName === 'Chrome') {
+    return [
+      'Tap the small icon at the left of the web address.',
+      'Tap Permissions (or Site settings).',
+      'Set Camera and Microphone to Allow.',
+      'Come back here and tap "Try again".',
+      phoneStep,
+    ];
+  }
+  if (browserName === 'Samsung Internet') {
+    return [
+      'Easiest: open this same address in Chrome instead.',
+      'Or: Samsung Internet menu (≡) → Settings → find Site permissions → allow Camera and Microphone for this site.',
+      'Come back here and tap "Try again".',
+      phoneStep,
+    ];
+  }
+  return [
+    "Open this browser's settings for this site.",
+    'Allow Camera and Microphone.',
+    'Come back here and tap "Try again".',
+  ];
+}
+
+function handleCameraFailure(error, elapsedMs, statesBefore) {
+  const kind = classifyCameraError(error, elapsedMs, statesBefore);
+  logPermissionAttempt('failed (' + kind + ')', statesBefore, error, elapsedMs);
+
+  if (kind === 'environment') {
+    showEnvironmentWarning();
+    fillNotice('permHelp', "The phone blocked the camera because of where this page is open.",
+      findEnvironmentProblems(),
+      ['Open the Chrome app.', "Paste this page's https:// address.", 'Tap "Enable camera & microphone".']);
+  } else if (kind === 'blocked') {
+    fillNotice('permHelp', 'Camera or microphone is blocked for this site.', null, blockedSteps());
+  } else if (kind === 'denied') {
+    fillNotice('permHelp', 'The permission was refused or the prompt was closed.', null,
+      ['Tap "Try again".', 'When the prompt appears, choose Allow for camera and microphone.',
+       'If no prompt appears, it is now blocked: follow the steps for a blocked site.']);
+  } else if (kind === 'no-device') {
+    fillNotice('permHelp', 'No camera or microphone was found.', null,
+      ['Check that no case or cover blocks the camera.', 'Tap "Try again".']);
+  } else if (kind === 'in-use') {
+    fillNotice('permHelp', 'Another app is using the camera or microphone.', null,
+      ['Close the camera app, calls, or any video app.', 'Come back here and tap "Try again".']);
+  } else if (kind === 'unsupported') {
+    fillNotice('permHelp', "This browser can't use the camera here.", null,
+      ["Open this page's https:// address in the Chrome app."]);
+  } else {
+    fillNotice('permHelp', 'Unexpected camera error: ' + error.name, [error.message],
+      ['Tap "Try again".', 'If it repeats, copy the report and send it to Claude.']);
+  }
+
+  $('cameraInfo').className = 'info error';
+  $('cameraInfo').textContent = 'Camera not on (' + error.name + ').';
+  $('cameraButton').disabled = false;
+  show('retryButton');
+  updateReport();
+}
+
+
+// ---------------------------------------------------------------------
+// 6. MICROPHONE METER
+// Shows the microphone is really picking up sound before you record.
+// ---------------------------------------------------------------------
+
+function startMicMeter(mediaStream) {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass || mediaStream.getAudioTracks().length === 0) {
+    $('micStatus').textContent = 'Microphone: no audio track';
+    return;
+  }
+  const audioContext = new AudioContextClass();
+  audioContext.resume().catch(() => {});
+  const analyser = audioContext.createAnalyser();
+  analyser.fftSize = 512;
+  audioContext.createMediaStreamSource(mediaStream).connect(analyser);
+  const samples = new Uint8Array(analyser.fftSize);
+  $('micStatus').textContent = 'Microphone: on — say something';
+
+  function measure() {
+    analyser.getByteTimeDomainData(samples);
+    let peak = 0;
+    for (const sample of samples) peak = Math.max(peak, Math.abs(sample - 128));
+    const level = Math.min(1, peak / 64);
+    $('micBar').style.width = Math.round(level * 100) + '%';
+    if (level > 0.15 && !facts.micHeard) {
+      facts.micHeard = true;
+      $('micStatus').className = 'info good';
+      $('micStatus').textContent = 'Microphone: ✓ hearing sound';
+      updateReport();
+    }
+    requestAnimationFrame(measure);
+  }
+  measure();
+}
+
+
+// ---------------------------------------------------------------------
+// 7. RECORDING
+// MediaRecorder hands us a piece of video every second.
+// Each piece goes straight into the database.
+// ---------------------------------------------------------------------
+
+// Formats in order of preference. MP4 first because CapCut and TikTok
+// handle it best. The phone uses the first one it supports.
+const FORMATS = [
+  'video/mp4;codecs=avc1,mp4a.40.2',
+  'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+  'video/mp4;codecs=avc1,opus',
+  'video/mp4;codecs=avc1',
+  'video/mp4',
+  'video/webm;codecs=vp9,opus',
+  'video/webm;codecs=vp8,opus',
+  'video/webm',
+];
+
+let recorder = null;
+let currentTake = null;
+let chunkIndex = 0;
+let pendingWrites = [];
+let recordingStartedAt = 0;
+let timerId = null;
+
+function pickFormat() {
+  return FORMATS.find((format) => MediaRecorder.isTypeSupported(format)) || '';
+}
+
+async function startRecording() {
+  if (!window.MediaRecorder) {
+    $('recStatus').textContent = 'This browser cannot record video.';
+    return;
+  }
+  const takes = await getAllTakes();
+  const format = pickFormat();
+  const options = { videoBitsPerSecond: 6000000, audioBitsPerSecond: 128000 };
+  if (format) options.mimeType = format;
+
+  try {
+    recorder = new MediaRecorder(stream, options);
+  } catch (error) {
+    $('recStatus').textContent = 'Could not start recording: ' + error.message;
+    return;
+  }
+
+  currentTake = {
+    id: 'take-' + Date.now(),
+    name: 'Take ' + (takes.length + 1),
+    mimeType: format || 'browser default',
+    createdAt: Date.now(),
+    finished: false,
+    chunkCount: 0,
+    sizeBytes: 0,
+    durationSec: 0,
+  };
+  chunkIndex = 0;
+  pendingWrites = [];
+
+  // Every ~1 second: save the new piece immediately.
+  recorder.ondataavailable = (event) => {
+    if (!event.data || event.data.size === 0) return;
+    const index = chunkIndex++;
+    const take = currentTake;
+    // The raw binary bytes of the video (ArrayBuffer). Never text.
+    const write = event.data.arrayBuffer().then((bytes) => saveChunk(take, index, bytes));
+    pendingWrites.push(write);
+  };
+  recorder.onstop = finishTake;
+  recorder.onerror = (event) => {
+    $('recStatus').textContent = 'Recording error: ' + (event.error ? event.error.message : 'unknown');
+  };
+
+  recorder.start(1000); // 1000 ms = one piece per second
+  recordingStartedAt = performance.now();
+  // The real format is only known after start on some browsers.
+  currentTake.mimeType = recorder.mimeType || currentTake.mimeType;
+  facts.formatChosen = currentTake.mimeType;
+  await saveTake(currentTake);
+
+  $('recordButton').textContent = 'Stop';
+  $('recStatus').className = 'rec-status recording';
+  timerId = setInterval(() => {
+    const seconds = (performance.now() - recordingStartedAt) / 1000;
+    $('recStatus').textContent = '● REC ' + formatTime(seconds);
+  }, 250);
+}
+
+function stopRecording() {
+  if (recorder && recorder.state === 'recording') recorder.stop();
+}
+
+// Called when the recorder has handed over its last piece.
+async function finishTake() {
+  clearInterval(timerId);
+  $('recordButton').textContent = 'Record';
+  $('recStatus').className = 'rec-status';
+  $('recStatus').textContent = 'Saving…';
+  const results = await Promise.allSettled(pendingWrites);
+  const failed = results.filter((r) => r.status === 'rejected').length;
+
+  currentTake.finished = true;
+  currentTake.durationSec = (performance.now() - recordingStartedAt) / 1000;
+  await saveTake(currentTake);
+
+  $('recStatus').className = failed ? 'rec-status warning' : 'rec-status good';
+  $('recStatus').textContent = failed
+    ? '⚠ Saved, but ' + failed + ' piece(s) failed to store.'
+    : '✓ Saved on this phone (not a backup yet — download it).';
+  await updateStorageInfo();
+  await renderTakeList();
+  await openTake(currentTake.id);
+}
+
+// Leaving the app while recording: TRY to finish the take.
+// This event does not always fire, which is why pieces are saved every second.
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) stopRecording();
+});
+
+
+// ---------------------------------------------------------------------
+// 8. FILE CHECKS, PLAYBACK, DOWNLOAD AND SHARE
+// Pipeline: saved binary pieces → ONE final File (real bytes + video type)
+// → the preview plays it → Download saves that same File → Share sends
+// that same File. No text, no base64, no data: address anywhere.
+// ---------------------------------------------------------------------
+
+// Real video files start with a known signature in their first bytes.
+// MP4: bytes 5–8 spell "ftyp". WebM: starts with 1A 45 DF A3.
+// Text ("a bunch of letters") has neither.
+function checkVideoSignature(firstPiece) {
+  if (!firstPiece || firstPiece.byteLength < 12) {
+    return { ok: false, container: '', label: '✗ too small to be a video' };
+  }
+  const b = new Uint8Array(firstPiece, 0, 12);
+  if (String.fromCharCode(b[4], b[5], b[6], b[7]) === 'ftyp') {
+    return { ok: true, container: 'video/mp4', label: '✓ real MP4 video data' };
+  }
+  if (b[0] === 0x1A && b[1] === 0x45 && b[2] === 0xDF && b[3] === 0xA3) {
+    return { ok: true, container: 'video/webm', label: '✓ real WebM video data' };
+  }
+  return { ok: false, container: '', label: '✗ does not start like a video file' };
+}
+
+// A ".mp4" name does not tell you what is inside. Chrome can put VP9 video
+// and Opus audio inside an MP4 box, and CapCut may reject that.
+// Every video file carries short name tags for its codecs near the start
+// ("avc1" = H.264, "mp4a" = AAC…). We look for those tags.
+const VIDEO_TAGS = [
+  ['vp09', 'VP9'], ['V_VP9', 'VP9'], ['av01', 'AV1'], ['V_AV1', 'AV1'],
+  ['hvc1', 'H.265'], ['hev1', 'H.265'], ['V_VP8', 'VP8'],
+  ['avc1', 'H.264'], ['V_MPEG4/ISO/AVC', 'H.264'],
+];
+const AUDIO_TAGS = [['Opus', 'Opus'], ['A_OPUS', 'Opus'], ['mp4a', 'AAC'], ['A_AAC', 'AAC']];
+
+function detectCodecs(firstPiece) {
+  if (!firstPiece) return 'unknown';
+  const start = new Uint8Array(firstPiece).slice(0, 65536);
+  const text = new TextDecoder('latin1').decode(start);
+  const video = VIDEO_TAGS.find(([tag]) => text.includes(tag));
+  const audio = AUDIO_TAGS.find(([tag]) => text.includes(tag));
+  const videoName = video ? video[1] : 'unknown video';
+  const audioName = audio ? audio[1] : 'unknown audio';
+  const safest = videoName === 'H.264' && audioName === 'AAC';
+  return videoName + ' + ' + audioName +
+    (safest ? ' (safest for CapCut/TikTok)' : ' (may not import everywhere — test in CapCut)');
+}
+
+let openFile = null;     // the ONE final file: preview, download and share all use it
+let openFileUrl = null;  // a temporary address pointing at that file's bytes
+
+function renderFileDetails(rows) {
+  const box = $('fileDetails');
+  box.textContent = '';
+  for (const [label, value] of rows) {
+    const row = document.createElement('div');
+    const name = document.createElement('span');
+    name.textContent = label + ': ';
+    row.appendChild(name);
+    row.appendChild(document.createTextNode(value));
+    box.appendChild(row);
+  }
+  show('fileDetails');
+}
+
+async function openTake(takeId) {
+  const takes = await getAllTakes();
+  const take = takes.find((t) => t.id === takeId);
+  if (!take) return;
+
+  // Lock the buttons until the new file is built and checked.
+  $('downloadButton').disabled = true;
+  hide('shareButton');
+
+  const pieces = await getChunks(takeId);
+  const signature = checkVideoSignature(pieces[0]);
+  // Trust the bytes over the label: the file's own signature decides its type.
+  const type = signature.container || take.mimeType.split(';')[0];
+  const extension = type === 'video/mp4' ? 'mp4' : type === 'video/webm' ? 'webm' : 'bin';
+  const name = 'creator-os-' + take.name.toLowerCase().replace(/\s+/g, '-') + '.' + extension;
+
+  // THE final file: the binary pieces joined, with the video type attached.
+  openFile = new File(pieces, name, { type: type });
+
+  // The old address is released only now, when you open another take —
+  // long after any download of it has started.
+  if (openFileUrl) URL.revokeObjectURL(openFileUrl);
+  openFileUrl = URL.createObjectURL(openFile);
+
+  facts.formatChosen = take.mimeType;
+  facts.codecs = detectCodecs(pieces[0]);
+  const status = take.finished ? 'complete' : 'interrupted, recovered';
+  const baseRows = [
+    ['MIME', openFile.type || '(empty!)'],
+    ['Size', formatMB(openFile.size) + ' (' + openFile.size.toLocaleString() + ' bytes)'],
+    ['Filename', openFile.name],
+    ['Recording duration', take.durationSec.toFixed(1) + ' s · ' + status],
+    ['File check', signature.label],
+    ['Codecs inside', facts.codecs],
+  ];
+  const describe = (resolution) => {
+    const rows = baseRows.concat([['Resolution', resolution]]);
+    renderFileDetails(rows);
+    facts.fileDetails = rows.map(([label, value]) => '  ' + label + ': ' + value).join('\n');
+  };
+  describe('loading…');
+
+  // The preview plays the SAME file object that Download will save.
+  const player = $('player');
+  show('player');
+  hide('emptyPlayer');
+  facts.previewResult = 'loading…';
+  player.onloadedmetadata = () => {
+    describe(player.videoWidth + '×' + player.videoHeight +
+      (player.videoHeight > player.videoWidth ? ' (portrait)' : ' (landscape)'));
+    facts.previewResult = 'plays in the app';
+    updateReport();
+  };
+  player.onerror = () => {
+    describe('unknown');
+    const code = player.error ? player.error.code : '?';
+    facts.previewResult = '✗ FAILED in the app (error code ' + code + ') → recording problem';
+    updateReport();
+  };
+  player.src = openFileUrl;
+
+  // Only offer Download once the file is real: has bytes and a video type.
+  const fileIsUsable = openFile.size > 0 && openFile.type.startsWith('video/');
+  $('downloadButton').disabled = !fileIsUsable;
+  $('downloadButton').textContent = fileIsUsable
+    ? 'Download ' + extension.toUpperCase() + ' (' + formatMB(openFile.size) + ')'
+    : 'Download unavailable (file check failed)';
+
+  const canShare = !!(fileIsUsable && navigator.canShare && navigator.canShare({ files: [openFile] }));
+  facts.shareAvailable = canShare ? 'yes' : 'no';
+  if (canShare) show('shareButton');
+  updateReport();
+}
+
+// Reliable baseline: a normal file download of the real bytes.
+function downloadOpenTake() {
+  if (!openFile) return;
+  const link = document.createElement('a');
+  link.href = openFileUrl;        // points at the File's bytes (blob:), not text
+  link.download = openFile.name;  // e.g. creator-os-take-1.mp4
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+// Optional convenience: the phone's share menu, with the same File.
+async function shareOpenTake() {
+  if (!openFile) return;
+  try {
+    await navigator.share({ files: [openFile], title: openFile.name });
+  } catch (error) {
+    if (error.name !== 'AbortError') facts.previewResult += ' · share failed: ' + error.message;
+    updateReport();
+  }
+}
+
+
+// ---------------------------------------------------------------------
+// 9. TAKE LIST
+// ---------------------------------------------------------------------
+
+async function renderTakeList() {
+  const takes = await getAllTakes();
+  const list = $('takeList');
+  list.textContent = '';
+  if (takes.length === 0) {
+    const empty = document.createElement('li');
+    empty.className = 'meta';
+    empty.textContent = 'No takes yet.';
+    list.appendChild(empty);
+    return;
+  }
+  for (const take of takes) {
+    const item = document.createElement('li');
+    const status = take.finished ? '✓ complete' : '⚠ interrupted — recovered';
+    item.innerHTML =
+      '<div class="name"></div>' +
+      '<div class="meta"></div>' +
+      '<div class="row"><button data-open>Open</button><button data-delete>Delete</button></div>';
+    item.querySelector('.name').textContent = take.name;
+    item.querySelector('.meta').textContent =
+      take.durationSec.toFixed(1) + ' s · ' + formatMB(take.sizeBytes) + ' · ' + status;
+
+    item.querySelector('[data-open]').onclick = () => openTake(take.id);
+
+    // Delete needs two taps, so a take is never lost by accident.
+    const deleteButton = item.querySelector('[data-delete]');
+    deleteButton.onclick = async () => {
+      if (deleteButton.dataset.armed) {
+        await deleteTake(take.id);
+        await renderTakeList();
+        await updateStorageInfo();
+        updateReport();
+      } else {
+        deleteButton.dataset.armed = 'yes';
+        deleteButton.textContent = 'Tap again to delete';
+        setTimeout(() => {
+          delete deleteButton.dataset.armed;
+          deleteButton.textContent = 'Delete';
+        }, 3000);
+      }
+    };
+    list.appendChild(item);
+  }
+}
+
+
+// ---------------------------------------------------------------------
+// 10. REPORT (copy it and paste it to Claude)
+// ---------------------------------------------------------------------
+
+function formatSupportList() {
+  if (!window.MediaRecorder) return '  MediaRecorder not available';
+  return FORMATS.map((f) => '  ' + (MediaRecorder.isTypeSupported(f) ? 'yes ' : 'no  ') + f).join('\n');
+}
+
+function updateReport() {
+  const problems = findEnvironmentProblems();
+  $('report').textContent = [
+    'CREATOR OS · M0 REPORT (v2)',
+    'Date: ' + new Date().toLocaleString(),
+    'Page address: ' + location.protocol + '//' + location.host + location.pathname,
+    'Browser: ' + browserName,
+    'User agent: ' + userAgent,
+    'HTTPS/secure: ' + (window.isSecureContext ? 'yes' : 'NO'),
+    'Inside another page/preview: ' + (isEmbedded() ? 'YES' : 'no'),
+    'Camera allowed in this window: ' + (cameraAllowedHere() ? 'yes' : 'NO'),
+    'Environment problems: ' + (problems.length ? problems.join(' | ') : 'none'),
+    'Permissions on page load: ' + facts.permissionsOnLoad,
+    'Permission attempts:',
+    facts.permissionLog.length ? facts.permissionLog.map((l) => '  ' + l).join('\n') : '  none yet',
+    'Camera: ' + (facts.camera || 'not on'),
+    'Microphone heard sound: ' + (facts.micHeard ? 'yes' : 'not yet'),
+    'Formats this browser can record:',
+    formatSupportList(),
+    'Format used: ' + (facts.formatChosen || '—'),
+    'Last file:',
+    facts.fileDetails || '  —',
+    'Preview: ' + (facts.previewResult || '—'),
+    'Share menu available: ' + facts.shareAvailable,
+    'Storage protected: ' + facts.persisted,
+    'Storage: ' + (facts.storage || '—'),
+  ].join('\n');
+}
+
+async function copyReport() {
+  try {
+    await navigator.clipboard.writeText($('report').textContent);
+    $('copyButton').textContent = '✓ Copied';
+  } catch (error) {
+    $('copyButton').textContent = 'Copy failed — take a screenshot';
+  }
+  setTimeout(() => { $('copyButton').textContent = 'Copy report'; }, 2500);
+}
+
+
+// ---------------------------------------------------------------------
+// 11. START
+// Nothing here asks for permission. It only reads and displays.
+// ---------------------------------------------------------------------
+
+$('cameraButton').onclick = enableCamera;
+$('retryButton').onclick = enableCamera;
+$('recordButton').onclick = () => {
+  if (recorder && recorder.state === 'recording') stopRecording();
+  else startRecording();
+};
+$('mirrorToggle').onchange = () => {
+  $('live').classList.toggle('mirror', $('mirrorToggle').checked);
+};
+$('downloadButton').onclick = downloadOpenTake;
+$('shareButton').onclick = shareOpenTake;
+$('copyButton').onclick = copyReport;
+
+$('live').classList.toggle('mirror', $('mirrorToggle').checked);
+showEnvironmentWarning();
+updateReport();
+
+readPermissions().then((states) => {
+  facts.permissionsOnLoad = 'camera=' + states.camera + ', mic=' + states.microphone;
+  updateReport();
+});
+
+openDatabase()
+  .then(async (database) => {
+    db = database;
+    // Just check (don't ask yet) whether storage is already protected.
+    if (navigator.storage && navigator.storage.persisted) {
+      facts.persisted = (await navigator.storage.persisted()) ? 'yes' : 'not yet (asked when the camera starts)';
+    }
+    await renderTakeList();
+    await updateStorageInfo();
+    updateReport();
+  })
+  .catch((error) => {
+    $('report').textContent = 'Database error: ' + error.message;
+  });
+</script>
+</body>
+</html>
