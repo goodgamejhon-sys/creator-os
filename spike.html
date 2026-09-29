@@ -3,261 +3,74 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Creator OS · M0 phone test</title>
-<style>
-  :root {
-    --bg: #0f1115;
-    --card: #1a1d24;
-    --line: #2a2f3a;
-    --text: #f2f3f5;
-    --muted: #9aa1ad;
-    --accent: #4f8cff;
-    --rec: #ff4d4f;
-    --ok: #3ecf8e;
-    --warn: #f5a524;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    font-size: 16px;
-    line-height: 1.4;
-  }
-  main { max-width: 520px; margin: 0 auto; padding: 8px 16px 48px; }
-  h2 {
-    font-size: 13px; margin: 0 0 10px; color: var(--muted);
-    text-transform: uppercase; letter-spacing: .05em;
-  }
-  .card { background: var(--card); border-radius: 14px; padding: 14px; margin-bottom: 14px; }
-  .sub { color: var(--muted); font-size: 13px; text-align: center; }
-  .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-  button {
-    flex: 1 1 auto; min-height: 48px; padding: 10px 12px;
-    font: inherit; font-weight: 600; color: var(--text);
-    background: var(--line); border: 0; border-radius: 10px;
-  }
-  button.primary { background: var(--accent); }
-  button.rec { background: var(--rec); }
-  button:disabled { opacity: .4; }
-  label.toggle { display: flex; gap: 8px; align-items: center; font-size: 14px; color: var(--muted); }
-  .info { font-size: 14px; color: var(--muted); margin: 8px 0 0; word-break: break-word; }
-  .error { color: var(--rec); }
-  .warning { color: var(--warn); }
-  .good { color: var(--ok); }
-  .hidden { display: none !important; }
-  .notice {
-    margin: 10px 0 0; padding: 12px; border-radius: 10px;
-    background: #2b2020; border: 1px solid #5a2f2f; font-size: 14px;
-  }
-  .notice b { display: block; margin-bottom: 4px; }
-  .notice ul, .notice ol { margin: 6px 0 0; padding-left: 26px; }
-  .notice li { margin-bottom: 4px; }
-  .prompter {
-    height: 36vh; height: 36svh;
-    overflow-y: auto; overscroll-behavior: contain;
-    background: #000; border-radius: 12px; padding: 6px 14px;
-  }
-  .prompter-text {
-    white-space: pre-wrap; word-break: break-word;
-    font-weight: 600; line-height: 1.35;
-    padding-bottom: 30vh;
-  }
-  .prompter-text.placeholder { color: var(--muted); font-weight: 400; }
-  .studio-row { display: flex; gap: 10px; margin-top: 10px; align-items: stretch; }
-  .frame {
-    height: 22vh; height: 22svh; aspect-ratio: 9 / 16; flex: none;
-    background: #000; border-radius: 10px; overflow: hidden;
-  }
-  .frame video { width: 100%; height: 100%; object-fit: cover; display: block; }
-  #live.mirror { transform: scaleX(-1); }
-  .studio-side { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
-  .studio-side .info { margin-top: 6px; font-size: 13px; }
-  .meter { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
-  #micBar { height: 100%; width: 0; background: var(--ok); transition: width .08s linear; }
-  .rec-status { font-weight: 700; min-height: 20px; font-size: 14px; margin-top: 6px; }
-  .rec-status.recording { color: var(--rec); }
-  .steppers { display: flex; gap: 8px; margin-top: 8px; }
-  .stepper {
-    flex: 1; display: flex; align-items: center; gap: 4px;
-    background: var(--card); border-radius: 10px; padding: 4px;
-  }
-  .stepper button { min-height: 44px; flex: none; width: 44px; padding: 0; }
-  .stepper span { flex: 1; text-align: center; font-size: 13px; color: var(--muted); }
-  .stepper b { display: block; color: var(--text); font-size: 15px; }
-  textarea {
-    width: 100%; min-height: 160px; padding: 10px;
-    font: inherit; color: var(--text); background: var(--bg);
-    border: 1px solid var(--line); border-radius: 10px; resize: vertical;
-  }
-  video#player {
-    display: block; width: 100%; max-height: 60vh;
-    background: #000; border-radius: 10px; object-fit: contain;
-  }
-  .details { font-size: 14px; margin-top: 10px; }
-  .details div { padding: 3px 0; border-top: 1px solid var(--line); word-break: break-word; }
-  .details div:first-child { border-top: 0; }
-  .details span { color: var(--muted); }
-  ul.takes { list-style: none; margin: 0; padding: 0; }
-  ul.takes li { border-top: 1px solid var(--line); padding: 10px 0; }
-  ul.takes li:first-child { border-top: 0; }
-  ul.takes .name { font-weight: 600; }
-  ul.takes .meta { font-size: 13px; color: var(--muted); }
-  ul.takes button { min-height: 40px; padding: 8px 12px; font-size: 14px; }
-  pre {
-    margin: 0; white-space: pre-wrap; word-break: break-word;
-    font-size: 12px; color: var(--muted); background: var(--bg);
-    padding: 10px; border-radius: 8px;
-  }
-</style>
+<title>Creator OS</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<main>
+<main id="setup" class="setup">
+  <h1>Creator OS</h1>
+  <p class="sub">Set up here. Perform in Studio.</p>
   <div id="envWarning" class="notice hidden"></div>
-  <section id="studio">
-    <div id="prompter" class="prompter">
-      <div id="prompterText" class="prompter-text"></div>
-    </div>
-    <div class="studio-row">
-      <div class="frame"><video id="live" autoplay muted playsinline></video></div>
-      <div class="studio-side">
-        <div class="meter"><div id="micBar"></div></div>
-        <p id="micStatus" class="info">Microphone: off</p>
-        <p id="recStatus" class="rec-status"></p>
-        <p id="cameraInfo" class="info"></p>
-      </div>
-    </div>
-    <div class="row">
-      <button id="playButton">▶ Play</button>
-      <button id="restartButton">↺ Restart</button>
-      <button id="cameraButton" class="primary">Enable camera &amp; microphone</button>
-      <button id="recordButton" class="rec hidden" disabled>● Record</button>
-    </div>
-    <div class="steppers">
-      <div class="stepper">
-        <button id="fontDown" aria-label="Smaller text">A−</button>
-        <span>Size<b id="fontValue">32</b></span>
-        <button id="fontUp" aria-label="Bigger text">A+</button>
-      </div>
-      <div class="stepper">
-        <button id="speedDown" aria-label="Slower">−</button>
-        <span>Speed<b id="speedValue">36</b></span>
-        <button id="speedUp" aria-label="Faster">+</button>
-      </div>
-    </div>
-    <div id="permHelp" class="notice hidden"></div>
-    <div class="row"><button id="retryButton" class="hidden">Try again</button></div>
-  </section>
-  <section class="card" style="margin-top:14px">
+  <section class="card">
     <h2><label for="scriptInput">Paste script</label></h2>
     <textarea id="scriptInput" placeholder="Paste your script here"></textarea>
     <div class="row"><button id="loadButton" class="primary">Load into teleprompter</button></div>
     <p id="scriptSaved" class="info"></p>
   </section>
   <section class="card">
-    <h2>Check and save</h2>
-    <p id="emptyPlayer" class="info">Record a take, then it appears here.</p>
+    <h2>Teleprompter</h2>
+    <div class="steppers">
+      <div class="stepper"><button id="fontDown" aria-label="Smaller text">A−</button><span>Size<b id="fontValue">32</b></span><button id="fontUp" aria-label="Bigger text">A+</button></div>
+      <div class="stepper"><button id="speedDown" aria-label="Slower">−</button><span>Speed<b id="speedValue">36</b></span><button id="speedUp" aria-label="Faster">+</button></div>
+    </div>
+    <div class="row"><p id="positionInfo" class="info grow">Position: start</p><button id="setupRestartButton" style="flex:none">↺ Back to start</button></div>
+  </section>
+  <section class="card">
+    <h2>Camera &amp; microphone</h2>
+    <div class="row" style="margin-top:0"><button id="cameraButton" class="primary">Enable camera &amp; microphone</button><button id="retryButton" class="hidden">Try again</button></div>
+    <div id="permHelp" class="notice hidden"></div>
+    <div class="meter"><div id="micBar"></div></div>
+    <p id="micStatus" class="info">Microphone: off</p>
+    <p id="cameraInfo" class="info"></p>
+    <label class="toggle"><input type="checkbox" id="mirrorToggle" checked>Mirror the preview (the recording is never mirrored)</label>
+  </section>
+  <section class="card">
+    <h2>Floating camera in Studio</h2>
+    <p class="label" style="margin-top:0">Size</p>
+    <div id="sizeChoices" class="segmented"><button data-size="small">Small</button><button data-size="medium">Medium</button></div>
+    <p class="label">Position</p>
+    <div id="positionChoices" class="segmented grid2"><button data-position="top-left">↖ Top left</button><button data-position="top-right">↗ Top right</button><button data-position="bottom-left">↙ Bottom left</button><button data-position="bottom-right">↘ Bottom right</button></div>
+  </section>
+  <section class="card">
+    <h2>Latest take</h2>
+    <p id="emptyPlayer" class="info">Record a take in Studio, then it appears here.</p>
     <video id="player" class="hidden" controls playsinline></video>
     <div id="fileDetails" class="details hidden"></div>
-    <div class="row">
-      <button id="downloadButton" disabled>Download file</button>
-      <button id="shareButton" class="hidden">Share…</button>
-    </div>
+    <div class="row"><button id="downloadButton" disabled>Download file</button><button id="shareButton" class="hidden">Share…</button></div>
     <p class="info">The preview plays the <b>same file</b> that Download saves. If the preview works but the downloaded file doesn't, the problem is the download. If the preview fails, it's the recording.</p>
   </section>
-  <section class="card">
-    <h2>Camera &amp; storage</h2>
-    <label class="toggle"><input type="checkbox" id="mirrorToggle" checked>Mirror the preview (the recording is never mirrored)</label>
-    <p id="pipelineInfo" class="info"></p>
-    <p id="storageInfo" class="info"></p>
-  </section>
   <section class="card"><h2>Takes on this phone</h2><ul id="takeList" class="takes"></ul></section>
-  <section class="card">
-    <h2>Report</h2>
-    <pre id="report">Nothing yet.</pre>
-    <div class="row"><button id="copyButton">Copy report</button></div>
-  </section>
-  <p class="sub">Creator OS · M0 phone test · v3</p>
+  <section class="card"><h2>Recording details</h2><p id="pipelineInfo" class="info" style="margin-top:0">Recording pipeline: starts with the camera.</p><p id="storageInfo" class="info"></p></section>
+  <section class="card"><h2>Report</h2><pre id="report">Nothing yet.</pre><div class="row"><button id="copyButton">Copy report</button></div></section>
+  <p class="sub footer">Creator OS · M0 · v4</p>
+  <div class="enter-bar"><button id="enterStudioButton" class="primary big">Enter Studio</button></div>
 </main>
-<script>
-const $=(id)=>document.getElementById(id);
-function formatMB(bytes){return(bytes/1024/1024).toFixed(1)+' MB'}
-function formatTime(seconds){const s=Math.floor(seconds);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
-function show(id){$(id).classList.remove('hidden')}function hide(id){$(id).classList.add('hidden')}
-function aspectLabel(width,height){if(!width||!height)return'?';const ratio=width/height;if(Math.abs(ratio-9/16)<0.01)return'9:16 portrait';if(Math.abs(ratio-16/9)<0.03)return'16:9 landscape';return ratio.toFixed(3)+(ratio<1?' portrait':' landscape')}
-function fillNotice(id,title,items,steps){const box=$(id);box.textContent='';const heading=document.createElement('b');heading.textContent=title;box.appendChild(heading);for(const[tag,lines]of[['ul',items],['ol',steps]]){if(!lines||!lines.length)continue;const list=document.createElement(tag);for(const text of lines){const li=document.createElement('li');li.textContent=text;list.appendChild(li)}box.appendChild(list)}box.classList.remove('hidden')}
-function loadSaved(key,fallback){try{const raw=localStorage.getItem(key);return raw===null?fallback:JSON.parse(raw)}catch(error){return fallback}}
-function saveLocal(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true}catch(error){return false}}
-const facts={permissionsOnLoad:'not read yet',permissionLog:[],cameraTrack:'',pipeline:'',micHeard:false,wakeLock:'not requested',latestTake:'',previewResult:'',persisted:'unknown',storage:'',shareAvailable:'unknown'};
-const userAgent=navigator.userAgent;
-function detectBrowser(){if(/SamsungBrowser/i.test(userAgent))return'Samsung Internet';if(/; wv\)/.test(userAgent))return'Android app viewer (WebView)';if(/EdgA?\//.test(userAgent))return'Edge';if(/OPR\//.test(userAgent))return'Opera';if(/Firefox|FxiOS/.test(userAgent))return'Firefox';if(/CriOS|Chrome\//.test(userAgent))return'Chrome';if(/Safari\//.test(userAgent))return'Safari';return'Other'}
-const browserName=detectBrowser();
-function isEmbedded(){try{return window.self!==window.top}catch(error){return true}}
-function cameraAllowedHere(){const policy=document.permissionsPolicy||document.featurePolicy;if(policy&&policy.allowsFeature)return policy.allowsFeature('camera')&&policy.allowsFeature('microphone');return true}
-function findEnvironmentProblems(){const problems=[];if(location.protocol==='file:'||location.protocol==='content:')problems.push('It was opened as a downloaded file. Phones block the camera for files.');else if(!window.isSecureContext)problems.push('It is not on an https:// address, so the camera is blocked.');if(browserName==='Android app viewer (WebView)')problems.push("It is open inside an app's built-in viewer, which usually blocks the camera.");if(isEmbedded())problems.push('It is running inside another page or a preview window.');if(!cameraAllowedHere())problems.push('This window is not allowed to use the camera or microphone.');if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)problems.push('This browser cannot open the camera from a web page.');if(!window.MediaRecorder)problems.push('This browser cannot record video from a web page.');return problems}
-function showEnvironmentWarning(){const problems=findEnvironmentProblems();if(problems.length===0){hide('envWarning');return}fillNotice('envWarning',"The camera can't work where this page is open:",problems,['Open the Chrome app.',"Type or paste this page's https:// address into the address bar.",'Tap "Enable camera & microphone".'])}
-let db=null;
-function openDatabase(){return new Promise((resolve,reject)=>{const request=indexedDB.open('creator-os-spike',1);request.onupgradeneeded=()=>{const database=request.result;database.createObjectStore('takes',{keyPath:'id'});const chunks=database.createObjectStore('chunks',{autoIncrement:true});chunks.createIndex('byTake','takeId')};request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error)})}
-function dbRun(tableName,mode,action){return new Promise((resolve,reject)=>{const transaction=db.transaction(tableName,mode);const request=action(transaction.objectStore(tableName));transaction.oncomplete=()=>resolve(request.result);transaction.onerror=()=>reject(transaction.error);transaction.onabort=()=>reject(transaction.error)})}
-function saveTake(take){return dbRun('takes','readwrite',table=>table.put(take))}
-async function getAllTakes(){const takes=await dbRun('takes','readonly',table=>table.getAll());return takes.sort((a,b)=>a.createdAt-b.createdAt)}
-function saveChunk(take,index,bytes){return new Promise((resolve,reject)=>{const transaction=db.transaction(['chunks','takes'],'readwrite');transaction.objectStore('chunks').add({takeId:take.id,index:index,data:bytes});take.chunkCount=Math.max(take.chunkCount,index+1);take.sizeBytes+=bytes.byteLength;take.durationSec=(performance.now()-recordingStartedAt)/1000;transaction.objectStore('takes').put(take);transaction.oncomplete=()=>resolve();transaction.onerror=()=>reject(transaction.error);transaction.onabort=()=>reject(transaction.error)})}
-async function getChunks(takeId){const rows=await dbRun('chunks','readonly',table=>table.index('byTake').getAll(takeId));rows.sort((a,b)=>a.index-b.index);return rows.map(row=>row.data)}
-function deleteTake(takeId){return new Promise((resolve,reject)=>{const transaction=db.transaction(['takes','chunks'],'readwrite');transaction.objectStore('takes').delete(takeId);const chunks=transaction.objectStore('chunks');const cursorRequest=chunks.index('byTake').openKeyCursor(IDBKeyRange.only(takeId));cursorRequest.onsuccess=()=>{const cursor=cursorRequest.result;if(cursor){chunks.delete(cursor.primaryKey);cursor.continue()}};transaction.oncomplete=()=>resolve();transaction.onerror=()=>reject(transaction.error)})}
-const LOW_SPACE_BYTES=300*1024*1024;const BYTES_PER_MINUTE=60*1024*1024;
-async function askForPersistentStorage(){if(!navigator.storage||!navigator.storage.persist){facts.persisted='not supported';return}let granted=await navigator.storage.persisted();if(!granted)granted=await navigator.storage.persist();facts.persisted=granted?'yes':'no (the browser may clear it if the phone runs low on space)'}
-async function updateStorageInfo(){if(!navigator.storage||!navigator.storage.estimate){facts.storage='not available on this browser';return}const{usage,quota}=await navigator.storage.estimate();const free=quota-usage;facts.storage=formatMB(usage)+' used of '+formatMB(quota);const line=$('storageInfo');if(free<LOW_SPACE_BYTES){line.className='info warning';line.textContent='Storage almost full: '+facts.storage+'. Download your takes and delete old ones before recording again.'}else{line.className='info';line.textContent='Storage: '+facts.storage+' · room for about '+Math.floor(free/BYTES_PER_MINUTE).toLocaleString()+' min of video.'}}
-let stream=null;
-async function readPermission(name){try{const status=await navigator.permissions.query({name:name});return status.state}catch(error){return'not detectable'}}
-async function readPermissions(){const[camera,microphone]=await Promise.all([readPermission('camera'),readPermission('microphone')]);return{camera,microphone}}
-function logPermissionAttempt(outcome,statesBefore,error,elapsedMs){const line=new Date().toLocaleTimeString()+' · '+outcome+' · before: camera='+statesBefore.camera+', mic='+statesBefore.microphone+(error?' · '+error.name+': '+error.message:'')+' · answered in '+Math.round(elapsedMs)+' ms';facts.permissionLog.push(line);console.log('[Creator OS] permission',line)}
-async function enableCamera(){hide('permHelp');hide('retryButton');$('cameraButton').disabled=true;$('cameraInfo').className='info';$('cameraInfo').textContent='Waiting for your answer…';if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){const error={name:'Unsupported',message:'navigator.mediaDevices.getUserMedia is missing'};handleCameraFailure(error,0,{camera:'not detectable',microphone:'not detectable'});return}const askedAt=performance.now();const request=navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1080},height:{ideal:1920},frameRate:{ideal:30}},audio:true});const outcome=request.then(result=>({stream:result,elapsed:performance.now()-askedAt}),error=>({error:error,elapsed:performance.now()-askedAt}));const statesBefore=await readPermissions();const result=await outcome;if(result.error){handleCameraFailure(result.error,result.elapsed,statesBefore);return}logPermissionAttempt('granted',statesBefore,null,result.elapsed);stream=result.stream;$('live').srcObject=stream;$('live').play().catch(()=>{});const settings=stream.getVideoTracks()[0].getSettings();facts.cameraTrack=settings.width+'×'+settings.height+' · '+aspectLabel(settings.width,settings.height)+' · '+Math.round(settings.frameRate||0)+' fps · '+(settings.facingMode||'unknown')+' camera';$('cameraInfo').className='info good';$('cameraInfo').textContent='Camera on';stream.getVideoTracks()[0].addEventListener('ended',()=>{stopRecording();$('cameraInfo').className='info warning';$('cameraInfo').textContent='Camera stopped. Tap "Try again".';show('retryButton');$('recordButton').disabled=true});hide('cameraButton');show('recordButton');$('recordButton').disabled=false;startMicMeter(stream);startPortraitPipeline();keepScreenOn();await askForPersistentStorage();await updateStorageInfo();updateReport()}
-function classifyCameraError(error,elapsedMs,statesBefore){if(statesBefore.camera==='denied'||statesBefore.microphone==='denied')return findEnvironmentProblems().length?'environment':'blocked';switch(error.name){case'NotAllowedError':case'PermissionDeniedError':case'SecurityError':if(findEnvironmentProblems().length)return'environment';if(elapsedMs<400)return'blocked';return'denied';case'NotFoundError':case'DevicesNotFoundError':case'OverconstrainedError':return'no-device';case'NotReadableError':case'TrackStartError':case'AbortError':return'in-use';case'TypeError':case'NotSupportedError':case'Unsupported':return'unsupported';default:return'unknown'}}
-function blockedSteps(){const appName=browserName==='Samsung Internet'?'Samsung Internet':'Chrome';const phoneStep='Still blocked? Phone Settings → Apps → '+appName+' → Permissions → set Camera and Microphone to Allow.';if(browserName==='Chrome')return['Tap the small icon at the left of the web address.','Tap Permissions (or Site settings).','Set Camera and Microphone to Allow.','Come back here and tap "Try again".',phoneStep];if(browserName==='Samsung Internet')return['Easiest: open this same address in Chrome instead.','Or: Samsung Internet menu (≡) → Settings → find Site permissions → allow Camera and Microphone for this site.','Come back here and tap "Try again".',phoneStep];return["Open this browser's settings for this site.",'Allow Camera and Microphone.','Come back here and tap "Try again".']}
-function handleCameraFailure(error,elapsedMs,statesBefore){const kind=classifyCameraError(error,elapsedMs,statesBefore);logPermissionAttempt('failed ('+kind+')',statesBefore,error,elapsedMs);if(kind==='environment'){showEnvironmentWarning();fillNotice('permHelp','The phone blocked the camera because of where this page is open.',findEnvironmentProblems(),['Open the Chrome app.',"Paste this page's https:// address.",'Tap "Enable camera & microphone".'])}else if(kind==='blocked')fillNotice('permHelp','Camera or microphone is blocked for this site.',null,blockedSteps());else if(kind==='denied')fillNotice('permHelp','The permission was refused or the prompt was closed.',null,['Tap "Try again".','When the prompt appears, choose Allow for camera and microphone.','If no prompt appears, it is now blocked: follow the steps for a blocked site.']);else if(kind==='no-device')fillNotice('permHelp','No camera or microphone was found.',null,['Check that no case or cover blocks the camera.','Tap "Try again".']);else if(kind==='in-use')fillNotice('permHelp','Another app is using the camera or microphone.',null,['Close the camera app, calls, or any video app.','Come back here and tap "Try again".']);else if(kind==='unsupported')fillNotice('permHelp',"This browser can't use the camera here.",null,["Open this page's https:// address in the Chrome app."]);else fillNotice('permHelp','Unexpected camera error: '+error.name,[error.message],['Tap "Try again".','If it repeats, copy the report and send it to Claude.']);$('cameraInfo').className='info error';$('cameraInfo').textContent='Camera not on ('+error.name+')';$('cameraButton').disabled=false;show('retryButton');updateReport()}
-let wakeLock=null;async function keepScreenOn(){if(!('wakeLock'in navigator)){facts.wakeLock='not supported (set the screen timeout longer)';return}try{wakeLock=await navigator.wakeLock.request('screen');facts.wakeLock='yes';wakeLock.addEventListener('release',()=>{facts.wakeLock='released'})}catch(error){facts.wakeLock='failed: '+error.name}updateReport()}
-function startMicMeter(mediaStream){const AudioContextClass=window.AudioContext||window.webkitAudioContext;if(!AudioContextClass||mediaStream.getAudioTracks().length===0){$('micStatus').textContent='Microphone: no audio track';return}const audioContext=new AudioContextClass();audioContext.resume().catch(()=>{});const analyser=audioContext.createAnalyser();analyser.fftSize=512;audioContext.createMediaStreamSource(mediaStream).connect(analyser);const samples=new Uint8Array(analyser.fftSize);$('micStatus').textContent='Mic on — say something';function measure(){analyser.getByteTimeDomainData(samples);let peak=0;for(const sample of samples)peak=Math.max(peak,Math.abs(sample-128));const level=Math.min(1,peak/64);$('micBar').style.width=Math.round(level*100)+'%';if(level>0.15&&!facts.micHeard){facts.micHeard=true;$('micStatus').className='info good';$('micStatus').textContent='Mic ✓ hearing sound';updateReport()}requestAnimationFrame(measure)}measure()}
-const OUTPUT={width:1080,height:1920,fps:30};const cropFocus={x:.5,y:.5};const portrait={canvas:null,context:null,stream:null,running:false,lastCrop:null};
-function computeCrop(sourceWidth,sourceHeight,focus){const targetRatio=OUTPUT.width/OUTPUT.height;let width=sourceWidth,height=sourceHeight;if(sourceWidth/sourceHeight>targetRatio)width=Math.round(sourceHeight*targetRatio);else height=Math.round(sourceWidth/targetRatio);return{x:Math.round((sourceWidth-width)*focus.x),y:Math.round((sourceHeight-height)*focus.y),width,height}}
-function describePipeline(){if(!portrait.running)return'direct camera (canvas recording not available in this browser)';const c=portrait.lastCrop;if(!c)return'portrait canvas '+OUTPUT.width+'×'+OUTPUT.height+' @ '+OUTPUT.fps+' fps · waiting for first frame';const scale=OUTPUT.width/c.width;return'portrait canvas '+OUTPUT.width+'×'+OUTPUT.height+' @ '+OUTPUT.fps+' fps · keeps '+c.width+'×'+c.height+' of camera '+c.sourceWidth+'×'+c.sourceHeight+' (centre crop) · scale '+scale.toFixed(2)+(scale>1.05?' ⚠ upscaled: softer picture':' (no upscaling)')}
-function startPortraitPipeline(){if(!HTMLCanvasElement.prototype.captureStream){facts.pipeline=describePipeline();return}portrait.canvas=document.createElement('canvas');portrait.canvas.width=OUTPUT.width;portrait.canvas.height=OUTPUT.height;portrait.context=portrait.canvas.getContext('2d',{alpha:false});portrait.stream=portrait.canvas.captureStream(OUTPUT.fps);portrait.running=true;const video=$('live');const drawFrame=()=>{if(!portrait.running)return;const sourceWidth=video.videoWidth,sourceHeight=video.videoHeight;if(sourceWidth&&sourceHeight){const crop=computeCrop(sourceWidth,sourceHeight,cropFocus);portrait.context.drawImage(video,crop.x,crop.y,crop.width,crop.height,0,0,OUTPUT.width,OUTPUT.height);const changed=!portrait.lastCrop||portrait.lastCrop.sourceWidth!==sourceWidth||portrait.lastCrop.sourceHeight!==sourceHeight;portrait.lastCrop=Object.assign({sourceWidth,sourceHeight},crop);if(changed){facts.pipeline=describePipeline();$('pipelineInfo').textContent='Recording pipeline: '+facts.pipeline;updateReport()}}scheduleNextFrame()};const scheduleNextFrame=()=>{if(video.requestVideoFrameCallback)video.requestVideoFrameCallback(drawFrame);else requestAnimationFrame(drawFrame)};scheduleNextFrame();facts.pipeline=describePipeline()}
-const KEYS={script:'creatorOS.m0.script',prompter:'creatorOS.m0.prompter'};const FONT={min:18,max:72,step:4};const SPEED={min:6,max:90,step:3};const prompterSettings=Object.assign({text:'',fontSize:32,speed:36,position:0},loadSaved(KEYS.prompter,{}));const prompter={playing:false,exact:0,lastWritten:0,lastTime:0,touching:false,lastSave:0};
-function savePrompterSettings(){const box=$('prompter');const max=box.scrollHeight-box.clientHeight;prompterSettings.position=max>0?Math.min(1,box.scrollTop/max):0;saveLocal(KEYS.prompter,prompterSettings)}
-function renderPrompter(){const text=$('prompterText');if(prompterSettings.text.trim()){text.textContent=prompterSettings.text;text.classList.remove('placeholder')}else{text.textContent='Paste your script below, then tap "Load into teleprompter".';text.classList.add('placeholder')}text.style.fontSize=prompterSettings.fontSize+'px';$('fontValue').textContent=prompterSettings.fontSize;$('speedValue').textContent=prompterSettings.speed}
-function restorePosition(fraction){requestAnimationFrame(()=>{const box=$('prompter');const max=box.scrollHeight-box.clientHeight;box.scrollTop=Math.max(0,fraction*max);prompter.exact=box.scrollTop;prompter.lastWritten=box.scrollTop})}
-function pixelsPerSecond(){const lineHeight=prompterSettings.fontSize*1.35;return(prompterSettings.speed*lineHeight)/60}
-function prompterTick(now){if(!prompter.playing)return;const box=$('prompter');const seconds=prompter.lastTime?Math.min(.1,(now-prompter.lastTime)/1000):0;prompter.lastTime=now;if(Math.abs(box.scrollTop-prompter.lastWritten)>2)prompter.exact=box.scrollTop;if(!prompter.touching)prompter.exact+=pixelsPerSecond()*seconds;const max=box.scrollHeight-box.clientHeight;if(prompter.exact>=max){box.scrollTop=max;pausePrompter();return}box.scrollTop=prompter.exact;prompter.lastWritten=box.scrollTop;if(now-prompter.lastSave>1000){savePrompterSettings();prompter.lastSave=now}requestAnimationFrame(prompterTick)}
-function playPrompter(){if(!prompterSettings.text.trim())return;const box=$('prompter');prompter.playing=true;prompter.exact=box.scrollTop;prompter.lastWritten=box.scrollTop;prompter.lastTime=0;$('playButton').textContent='❚❚ Pause';requestAnimationFrame(prompterTick)}
-function pausePrompter(){prompter.playing=false;$('playButton').textContent='▶ Play';savePrompterSettings()}
-function restartPrompter(){pausePrompter();$('prompter').scrollTop=0;prompter.exact=0;prompter.lastWritten=0;savePrompterSettings()}
-function changeFont(step){savePrompterSettings();prompterSettings.fontSize=Math.min(FONT.max,Math.max(FONT.min,prompterSettings.fontSize+step));renderPrompter();restorePosition(prompterSettings.position);saveLocal(KEYS.prompter,prompterSettings)}
-function changeSpeed(step){prompterSettings.speed=Math.min(SPEED.max,Math.max(SPEED.min,prompterSettings.speed+step));renderPrompter();saveLocal(KEYS.prompter,prompterSettings)}
-function loadScript(){pausePrompter();prompterSettings.text=$('scriptInput').value;prompterSettings.position=0;renderPrompter();$('prompter').scrollTop=0;prompter.exact=0;prompter.lastWritten=0;const saved=saveLocal(KEYS.prompter,prompterSettings)&&saveLocal(KEYS.script,$('scriptInput').value);$('scriptSaved').textContent=saved?'✓ Loaded and saved on this phone':'⚠ Loaded, but could not be saved';window.scrollTo({top:0,behavior:'smooth'});updateReport()}
-let scriptSaveTimer=null;function onScriptInput(){clearTimeout(scriptSaveTimer);scriptSaveTimer=setTimeout(()=>{const saved=saveLocal(KEYS.script,$('scriptInput').value);$('scriptSaved').textContent=saved?'✓ Script saved on this phone':'⚠ Could not save the script'},400)}
-const FORMATS=['video/mp4;codecs=avc1,mp4a.40.2','video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4;codecs=avc1,opus','video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];let recorder=null,currentTake=null,chunkIndex=0,pendingWrites=[],recordingStartedAt=0,timerId=null;
-function pickFormat(){return FORMATS.find(format=>MediaRecorder.isTypeSupported(format))||''}
-async function startRecording(){if(!window.MediaRecorder){$('recStatus').textContent='This browser cannot record video.';return}const takes=await getAllTakes();const format=pickFormat();const options={videoBitsPerSecond:8000000,audioBitsPerSecond:128000,videoKeyFrameIntervalDuration:1000};if(format)options.mimeType=format;const recordingStream=portrait.running?new MediaStream([...portrait.stream.getVideoTracks(),...stream.getAudioTracks()]):stream;try{recorder=new MediaRecorder(recordingStream,options)}catch(error){$('recStatus').textContent='Could not start recording: '+error.message;return}currentTake={id:'take-'+Date.now(),name:'Take '+(takes.length+1),mimeType:format||'browser default',createdAt:Date.now(),finished:false,chunkCount:0,sizeBytes:0,durationSec:0,cameraTrack:facts.cameraTrack,pipeline:describePipeline()};chunkIndex=0;pendingWrites=[];recorder.ondataavailable=event=>{if(!event.data||event.data.size===0)return;const index=chunkIndex++;const take=currentTake;const write=event.data.arrayBuffer().then(bytes=>saveChunk(take,index,bytes));pendingWrites.push(write)};recorder.onstop=finishTake;recorder.onerror=event=>{$('recStatus').textContent='Recording error: '+(event.error?event.error.message:'unknown')};recorder.start(1000);recordingStartedAt=performance.now();currentTake.mimeType=recorder.mimeType||currentTake.mimeType;await saveTake(currentTake);$('recordButton').textContent='■ Stop';$('recStatus').className='rec-status recording';timerId=setInterval(()=>{const seconds=(performance.now()-recordingStartedAt)/1000;$('recStatus').textContent='● REC '+formatTime(seconds)},250)}
-function stopRecording(){if(recorder&&recorder.state==='recording')recorder.stop()}
-async function finishTake(){clearInterval(timerId);$('recordButton').textContent='● Record';$('recStatus').className='rec-status';$('recStatus').textContent='Saving…';const results=await Promise.allSettled(pendingWrites);const failed=results.filter(r=>r.status==='rejected').length;currentTake.finished=true;currentTake.durationSec=(performance.now()-recordingStartedAt)/1000;await saveTake(currentTake);$('recStatus').className=failed?'rec-status warning':'rec-status good';$('recStatus').textContent=failed?'⚠ '+failed+' piece(s) failed':'✓ Saved on phone';await updateStorageInfo();await renderTakeList();await openTake(currentTake.id)}
-document.addEventListener('visibilitychange',()=>{if(document.hidden){stopRecording();if(prompter.playing)pausePrompter()}else if(stream&&(!wakeLock||wakeLock.released))keepScreenOn()});
-function checkVideoSignature(buffer){if(!buffer||buffer.byteLength<12)return{ok:false,container:'',label:'✗ too small to be a video'};const b=new Uint8Array(buffer,0,12);if(String.fromCharCode(b[4],b[5],b[6],b[7])==='ftyp')return{ok:true,container:'video/mp4',label:'✓ real MP4 video data'};if(b[0]===0x1A&&b[1]===0x45&&b[2]===0xDF&&b[3]===0xA3)return{ok:true,container:'video/webm',label:'✓ real WebM video data'};return{ok:false,container:'',label:'✗ does not start like a video file'}}
-const VIDEO_TAGS=[['vp09','VP9'],['V_VP9','VP9'],['av01','AV1'],['V_AV1','AV1'],['hvc1','H.265'],['hev1','H.265'],['V_VP8','VP8'],['avc1','H.264'],['V_MPEG4/ISO/AVC','H.264']];const AUDIO_TAGS=[['Opus','Opus'],['A_OPUS','Opus'],['mp4a','AAC'],['A_AAC','AAC']];
-function detectCodecs(buffer){const text=new TextDecoder('latin1').decode(new Uint8Array(buffer).slice(0,65536));const video=VIDEO_TAGS.find(([tag])=>text.includes(tag));const audio=AUDIO_TAGS.find(([tag])=>text.includes(tag));return{video:video?video[1]:'unknown',audio:audio?audio[1]:'unknown'}}
-const CODEC_NAMES={avc1:'H.264',avc3:'H.264',hvc1:'H.265',hev1:'H.265',vp09:'VP9',av01:'AV1',mp4a:'AAC',Opus:'Opus'};
-function analyzeMp4(buffer){const view=new DataView(buffer),tracks={};let track=null,fragmentTrackId=null;const CONTAINERS=['moov','trak','mdia','minf','stbl','moof','traf','edts','dinf'];const name=at=>String.fromCharCode(view.getUint8(at),view.getUint8(at+1),view.getUint8(at+2),view.getUint8(at+3));function walk(start,end){let at=start;while(at+8<=end){let size=view.getUint32(at);const type=name(at+4);let header=8;if(size===1){size=Number(view.getBigUint64(at+8));header=16}else if(size===0)size=end-at;if(size<header||at+size>end)break;const body=at+header;if(type==='trak'){track={};walk(body,at+size);if(track.id)tracks[track.id]=track;track=null}else if(CONTAINERS.includes(type))walk(body,at+size);else if(type==='tkhd'&&track){const version=view.getUint8(body);let p=body+4+(version===1?16:8);track.id=view.getUint32(p);p+=4+4+(version===1?8:4)+16;const a=view.getInt32(p)/65536,b=view.getInt32(p+4)/65536;const clockwise=(Math.round(Math.atan2(b,a)*180/Math.PI)+360)%360;track.rotation=(360-clockwise)%360}else if(type==='hdlr'&&track)track.kind=name(body+8);else if(type==='stsd'&&track){const entry=body+8;track.codec=name(entry+4);if(track.kind==='vide'){track.width=view.getUint16(entry+32);track.height=view.getUint16(entry+34)}}else if(type==='stsz'&&track)track.samples=(track.samples||0)+view.getUint32(body+8);else if(type==='tfhd')fragmentTrackId=view.getUint32(body+4);else if(type==='trun'&&tracks[fragmentTrackId]){const t=tracks[fragmentTrackId];t.samples=(t.samples||0)+view.getUint32(body+4)}at+=size}}walk(0,buffer.byteLength);const all=Object.values(tracks);return{video:all.find(t=>t.kind==='vide'),audio:all.find(t=>t.kind==='soun')}}
-let openFile=null,openFileUrl=null;
-function renderFileDetails(rows){const box=$('fileDetails');box.textContent='';for(const[label,value]of rows){const row=document.createElement('div'),name=document.createElement('span');name.textContent=label+': ';row.appendChild(name);row.appendChild(document.createTextNode(value));box.appendChild(row)}show('fileDetails')}
-async function openTake(takeId){const takes=await getAllTakes();const take=takes.find(t=>t.id===takeId);if(!take)return;$('downloadButton').disabled=true;$('downloadButton').textContent='Checking file…';hide('shareButton');const pieces=await getChunks(takeId);if(pieces.length===0){const player=$('player');player.removeAttribute('src');hide('player');show('emptyPlayer');$('emptyPlayer').textContent=take.name+' has no saved video: it stopped before the first piece was stored.';renderFileDetails([['File','empty']]);$('downloadButton').textContent='Nothing to download';facts.previewResult='no video in this take';facts.latestTake=take.name+' ('+new Date(take.createdAt).toLocaleString()+')\n  empty: stopped before the first piece was stored';updateReport();return}const signature=checkVideoSignature(pieces[0]);const type=signature.container||take.mimeType.split(';')[0];const extension=type==='video/mp4'?'mp4':type==='video/webm'?'webm':'bin';const fileName='creator-os-'+take.name.toLowerCase().replace(/\s+/g,'-')+'.'+extension;openFile=new File(pieces,fileName,{type:type});if(openFileUrl)URL.revokeObjectURL(openFileUrl);openFileUrl=URL.createObjectURL(openFile);const buffer=await openFile.arrayBuffer();let mp4=null;if(signature.container==='video/mp4'){try{mp4=analyzeMp4(buffer)}catch(error){mp4=null}}const tagged=detectCodecs(buffer);const videoTrack=mp4&&mp4.video;const videoCodec=videoTrack?(CODEC_NAMES[videoTrack.codec]||videoTrack.codec)+' ('+videoTrack.codec+')':tagged.video;const audioCodec=mp4&&mp4.audio?(CODEC_NAMES[mp4.audio.codec]||mp4.audio.codec)+' ('+mp4.audio.codec+')':tagged.audio;const build=player=>{const duration=player&&isFinite(player.duration)&&player.duration>0?player.duration:take.durationSec;const rotation=videoTrack?videoTrack.rotation:0;let encoded='?',playsWidth=player?player.videoWidth:0,playsHeight=player?player.videoHeight:0;if(videoTrack&&videoTrack.width){encoded=videoTrack.width+'×'+videoTrack.height+' · '+aspectLabel(videoTrack.width,videoTrack.height);if(!playsWidth){const turned=rotation===90||rotation===270;playsWidth=turned?videoTrack.height:videoTrack.width;playsHeight=turned?videoTrack.width:videoTrack.height}}let verdict='✗ not portrait 9:16';if(aspectLabel(playsWidth,playsHeight)==='9:16 portrait')verdict=rotation?'⚠ portrait only through a rotation tag (some apps ignore it)':'✓ genuinely portrait 9:16';const frames=videoTrack&&videoTrack.samples;const rows=[['MIME',openFile.type||'(empty!)'],['Size',formatMB(openFile.size)+' ('+openFile.size.toLocaleString()+' bytes)'],['Filename',openFile.name],['Recording duration',take.durationSec.toFixed(1)+' s · '+(take.finished?'complete':'interrupted, recovered')],['File check',signature.label],['Encoded size',encoded],['Rotation tag',videoTrack?(rotation?rotation+'°':'none'):'n/a'],['Plays as',playsWidth?playsWidth+'×'+playsHeight+' · '+aspectLabel(playsWidth,playsHeight):'loading…'],['Portrait 9:16',playsWidth?verdict:'checking…'],['Frame rate',frames?(frames/duration).toFixed(1)+' fps average ('+frames+' frames / '+duration.toFixed(1)+' s)':'not detectable'],['Video codec',videoCodec],['Audio codec',audioCodec],['Bitrate',((openFile.size*8)/duration/1e6).toFixed(1)+' Mbps average'],['Recorded with',(take.cameraTrack?'camera '+take.cameraTrack:'camera ?')+' → '+(take.pipeline||'?')],['Format requested',take.mimeType]];renderFileDetails(rows);facts.latestTake=take.name+' ('+new Date(take.createdAt).toLocaleString()+')\n'+rows.map(([label,value])=>'  '+label+': '+value).join('\n')};build(null);const player=$('player');show('player');hide('emptyPlayer');$('emptyPlayer').textContent='Record a take, then it appears here.';facts.previewResult='loading…';player.onloadedmetadata=()=>{facts.previewResult='plays in the app';build(player);updateReport()};player.onerror=()=>{const code=player.error?player.error.code:'?';facts.previewResult='✗ FAILED in the app (error code '+code+') → recording problem';updateReport()};player.src=openFileUrl;const fileIsUsable=openFile.size>0&&openFile.type.startsWith('video/');$('downloadButton').disabled=!fileIsUsable;$('downloadButton').textContent=fileIsUsable?'Download '+extension.toUpperCase()+' ('+formatMB(openFile.size)+')':'Download unavailable (file check failed)';const canShare=!!(fileIsUsable&&navigator.canShare&&navigator.canShare({files:[openFile]}));facts.shareAvailable=canShare?'yes':'no';if(canShare)show('shareButton');updateReport()}
-function downloadOpenTake(){if(!openFile)return;const link=document.createElement('a');link.href=openFileUrl;link.download=openFile.name;document.body.appendChild(link);link.click();link.remove()}
-async function shareOpenTake(){if(!openFile)return;try{await navigator.share({files:[openFile],title:openFile.name})}catch(error){if(error.name!=='AbortError')facts.previewResult+=' · share failed: '+error.message;updateReport()}}
-async function renderTakeList(){const takes=await getAllTakes(),list=$('takeList');list.textContent='';if(takes.length===0){const empty=document.createElement('li');empty.className='meta';empty.textContent='No takes yet.';list.appendChild(empty);return takes}for(const take of takes){const item=document.createElement('li');const status=take.finished?'✓ complete':'⚠ interrupted — recovered';item.innerHTML='<div class="name"></div><div class="meta"></div><div class="row"><button data-open>Open</button><button data-delete>Delete</button></div>';item.querySelector('.name').textContent=take.name;item.querySelector('.meta').textContent=take.durationSec.toFixed(1)+' s · '+formatMB(take.sizeBytes)+' · '+status;item.querySelector('[data-open]').onclick=()=>openTake(take.id);const deleteButton=item.querySelector('[data-delete]');deleteButton.onclick=async()=>{if(deleteButton.dataset.armed){await deleteTake(take.id);await renderTakeList();await updateStorageInfo();updateReport()}else{deleteButton.dataset.armed='yes';deleteButton.textContent='Tap again to delete';setTimeout(()=>{delete deleteButton.dataset.armed;deleteButton.textContent='Delete'},3000)}};list.appendChild(item)}return takes}
-function formatSupportList(){if(!window.MediaRecorder)return'  MediaRecorder not available';return FORMATS.map(f=>'  '+(MediaRecorder.isTypeSupported(f)?'yes ':'no  ')+f).join('\n')}
-function updateReport(){const problems=findEnvironmentProblems();$('report').textContent=['CREATOR OS · M0 REPORT (v3)','Date: '+new Date().toLocaleString(),'Page address: '+location.protocol+'//'+location.host+location.pathname,'Browser: '+browserName,'User agent: '+userAgent,'HTTPS/secure: '+(window.isSecureContext?'yes':'NO')+' · inside another page: '+(isEmbedded()?'YES':'no')+' · camera allowed here: '+(cameraAllowedHere()?'yes':'NO'),'Environment problems: '+(problems.length?problems.join(' | '):'none'),'Permissions on page load: '+facts.permissionsOnLoad,'Permission attempts:',facts.permissionLog.length?facts.permissionLog.map(l=>'  '+l).join('\n'):'  none yet','Microphone heard sound: '+(facts.micHeard?'yes':'not yet'),'Screen kept awake: '+facts.wakeLock,'','CAMERA TRACK (now): '+(facts.cameraTrack||'camera not on'),'OUTPUT PIPELINE (now): '+(stream?describePipeline():'camera not on'),'Formats this browser can record:',formatSupportList(),'','LATEST TAKE: '+(facts.latestTake||'none yet'),'Preview: '+(facts.previewResult||'—'),'Share menu available: '+facts.shareAvailable,'','TELEPROMPTER: script '+prompterSettings.text.length.toLocaleString()+' characters · size '+prompterSettings.fontSize+' · speed '+prompterSettings.speed+' lines/min · position '+Math.round(prompterSettings.position*100)+'%','Storage protected: '+facts.persisted,'Storage: '+(facts.storage||'—')].join('\n')}
-async function copyReport(){updateReport();try{await navigator.clipboard.writeText($('report').textContent);$('copyButton').textContent='✓ Copied'}catch(error){$('copyButton').textContent='Copy failed — take a screenshot'}setTimeout(()=>{$('copyButton').textContent='Copy report'},2500)}
-$('cameraButton').onclick=enableCamera;$('retryButton').onclick=enableCamera;$('recordButton').onclick=()=>{if(recorder&&recorder.state==='recording')stopRecording();else startRecording()};$('playButton').onclick=()=>prompter.playing?pausePrompter():playPrompter();$('restartButton').onclick=restartPrompter;$('fontDown').onclick=()=>changeFont(-FONT.step);$('fontUp').onclick=()=>changeFont(FONT.step);$('speedDown').onclick=()=>changeSpeed(-SPEED.step);$('speedUp').onclick=()=>changeSpeed(SPEED.step);$('loadButton').onclick=loadScript;$('scriptInput').addEventListener('input',onScriptInput);$('mirrorToggle').onchange=()=>$('live').classList.toggle('mirror',$('mirrorToggle').checked);$('downloadButton').onclick=downloadOpenTake;$('shareButton').onclick=shareOpenTake;$('copyButton').onclick=copyReport;
-const prompterBox=$('prompter');prompterBox.addEventListener('touchstart',()=>{prompter.touching=true},{passive:true});prompterBox.addEventListener('touchend',()=>{prompter.touching=false},{passive:true});prompterBox.addEventListener('touchcancel',()=>{prompter.touching=false},{passive:true});prompterBox.addEventListener('scroll',()=>{if(prompter.playing)return;clearTimeout(prompter.scrollTimer);prompter.scrollTimer=setTimeout(()=>{savePrompterSettings();updateReport()},300)},{passive:true});window.addEventListener('pagehide',savePrompterSettings);
-$('scriptInput').value=loadSaved(KEYS.script,'');renderPrompter();restorePosition(prompterSettings.position);$('live').classList.toggle('mirror',$('mirrorToggle').checked);showEnvironmentWarning();updateReport();readPermissions().then(states=>{facts.permissionsOnLoad='camera='+states.camera+', mic='+states.microphone;updateReport()});openDatabase().then(async database=>{db=database;if(navigator.storage&&navigator.storage.persisted)facts.persisted=(await navigator.storage.persisted())?'yes':'not yet (asked when the camera starts)';const takes=await renderTakeList();await updateStorageInfo();const withVideo=takes.filter(t=>t.sizeBytes>0);if(withVideo.length)await openTake(withVideo[withVideo.length-1].id);updateReport()}).catch(error=>{$('report').textContent='Database error: '+error.message});
-</script>
+<section id="studio" class="studio prompter-focus" aria-label="Studio">
+  <div id="prompter" class="prompter"><div id="prompterText" class="prompter-text"></div><div id="prompterSpacer"></div></div>
+  <div id="cameraFrame" class="camera size-small pos-bottom-right"><video id="live" autoplay muted playsinline></video></div>
+  <div class="studio-top"><button id="exitStudioButton" class="icon-button" aria-label="Close Studio">✕</button><p id="recStatus" class="rec-status"></p><button id="layoutButton" class="icon-button" aria-label="Change layout">⇄</button></div>
+  <p id="studioToast" class="studio-toast"></p>
+  <div class="studio-bottom">
+    <div class="seek-row"><button data-seek="-4">−4s</button><button data-seek="-2">−2s</button><button data-seek="-1">−1s</button><span class="gap"></span><button data-seek="1">+1s</button><button data-seek="2">+2s</button><button data-seek="4">+4s</button></div>
+    <div class="main-row"><button id="restartButton" aria-label="Back to start">↺</button><button id="playButton">▶ Play</button><button id="recordButton" class="rec" disabled>● Rec</button></div>
+  </div>
+</section>
+<script src="app-base.js"></script>
+<script src="app-camera.js"></script>
+<script src="app-prompter.js"></script>
+<script src="app-media-0.js"></script>
+<script src="app-media-1.js"></script>
+<script src="app-media-2.js"></script>
+<script src="app-start.js"></script>
 </body>
 </html>
